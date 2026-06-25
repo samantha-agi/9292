@@ -120,3 +120,60 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ---- 9292 checker pattern (2x2, the iconic 9292 look) ------------------ */
+/* TL=black, TR=white, BL=white, BR=black                                  */
+.checker-2x2 {
+  background-color: #fff;
+  background-image:
+    linear-gradient(to bottom right, #000 50%, transparent 50%),
+    linear-gradient(to bottom left, #000 50%, transparent 50%),
+    linear-gradient(to top right, #000 50%, transparent 50%),
+    linear-gradient(to top left, #000 50%, transparent 50%);
+  background-size: 50% 50%;
+  background-position: top left, top right, bottom left, bottom right;
+  background-repeat: no-repeat;
+}
+:is(.dark) .checker-2x2 {
+  /* Invert so the checker stays punchy on dark backgrounds */
+  background-color: #000;
+  background-image:
+    linear-gradient(to bottom right, #fff 50%, transparent 50%),
+    linear-gradient(to bottom left, #fff 50%, transparent 50%),
+    linear-gradient(to top right, #fff 50%, transparent 50%),
+    linear-gradient(to top left, #fff 50%, transparent 50%);
+}
+
+/* Subtle tiled checker for section backgrounds (very low opacity) */
+.checker-tile {
+  background-image:
+    linear-gradient(45deg, currentColor 25%, transparent 25%, transparent 75%, currentColor 75%),
+    linear-gradient(45deg, currentColor 25%, transparent 25%, transparent 75%, currentColor 75%);
+  background-size: 28px 28px;
+  background-position: 0 0, 14px 14px;
+}
+
+/* ---- Custom scrollbars (used inside code blocks & long lists) --------- */
+.scroll-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.scroll-thin::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.scroll-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scroll-thin::-webkit-scrollbar-thumb {
+  background-color: var(--border);
+  border-radius: 9999px;
+}
+.scroll-thin::-webkit-scrollbar-thumb:hover {
+  background-color: var(--muted-foreground);
+}
+
+/* Smooth in-page anchor scrolling */
+html {
+  scroll-behavior: smooth;
+}

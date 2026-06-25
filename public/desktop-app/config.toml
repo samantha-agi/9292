@@ -1,0 +1,48 @@
+# =====================================================================
+# 9292 Desktop App — user configuration
+# =====================================================================
+# This file is read by the 9292 desktop app on every launch. Edit it,
+# save, and restart the app to apply changes.
+#
+# Location (after install):  ~/.config/9292-app/config.toml
+#
+# Anything you leave out falls back to the built-in defaults shown
+# below. You can delete this file at any time to reset the app.
+# =====================================================================
+
+[window]
+# Startup size of the window.
+#   - "maximized"  -> window starts maximised (a.k.a. 100%)
+#   - "WxH"        -> window starts at that pixel size, e.g. "640x480"
+#   - "100%"       -> alias for "maximized"
+# Examples: "1280x720", "640x480", "375x812" (mobile layout), "maximized"
+startup_size = "1280x720"
+
+# Window title shown in the title bar.
+#   - "auto"  -> follow the page's <title> (e.g. "Plan je reis | 9292")
+#   - "9292"  -> always show "9292"
+#   - any other string -> shown verbatim
+title = "auto"
+
+
+[titlebar]
+# Toggle each button in the window's title bar.
+# All four can be turned off independently.
+reload   = true
+minimize = true
+maximize = true
+close    = true
+
+
+[web]
+# The URL the app loads. Defaults to the official 9292 homepage.
+url = "https://9292.nl/"
+
+# Optional user-agent override.
+#   - "" (empty)  -> use WebKitGTK's default (desktop Chrome-like UA)
+#   - any string  -> sent verbatim as the User-Agent header
+#
+# Useful for forcing the mobile or desktop layout of 9292 regardless of
+# the window size, e.g.:
+#   user_agent = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"
+user_agent = ""
