@@ -42,6 +42,12 @@ from gi.repository import Gtk, WebKit2, GLib, Gdk, Gio  # noqa: E402
 
 APP_ID = "nl.9292.desktopapp"
 APP_NAME = "9292"
+# The WM_CLASS the running window reports to the window manager.
+# In GTK4, set_wmclass() was removed. WM_CLASS is set via GLib.set_prgname()
+# (works on X11; on Wayland the app-id is used). The .desktop file's
+# StartupWMClass must match this value so GNOME groups the running window
+# under the launcher icon.
+WM_CLASS = "9292ov"
 DEFAULT_URL = "https://9292.nl/"
 
 CONFIG_DIR = Path.home() / ".config" / "9292-app"
@@ -261,6 +267,10 @@ class NineTwoNineApp(Gtk.Application):
 # ---------------------------------------------------------------------------
 
 def main() -> int:
+    # Set the program name early — this becomes the WM_CLASS on X11 and
+    # must match StartupWMClass in the .desktop file.
+    GLib.set_prgname(WM_CLASS)
+    GLib.set_application_name(APP_NAME)
     app = NineTwoNineApp()
     return app.run(sys.argv)
 

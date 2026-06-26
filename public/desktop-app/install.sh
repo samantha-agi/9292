@@ -17,6 +17,7 @@ set -euo pipefail
 # ----- paths ----------------------------------------------------------
 APP_NAME="9292"
 APP_ID="nl.9292.desktopapp"
+WM_CLASS="9292ov"
 DATA_DIR="${HOME}/.local/share/9292-app"
 CONFIG_DIR="${HOME}/.config/9292-app"
 APPS_DIR="${HOME}/.local/share/applications"
@@ -238,24 +239,20 @@ EOF
     # 4) Config file
     write_config
 
-    # 5) .desktop entry
-    cat > "$DESKTOP_FILE" <<EOF
-[Desktop Entry]
-Version=1.0
-Type=Application
-Name=9292
-GenericName=Travel Planner
-Comment=Plan your trip with Dutch public transport
-Comment[nl]=Plan je reis met het openbaar vervoer
-Exec=$RUN_FILE %U
-Icon=$ICON_FILE
-Terminal=false
-Categories=Travel;Network;GTK;GNOME;
-Keywords=9292;reisplanner;ov;public transport;travel;trein;bus;tram;metro;ferry;
-StartupNotify=true
-StartupWMClass=$APP_ID
-EOF
-    ok "Menu entry: $DESKTOP_FILE"
+    # 5) .desktop entry — copy the static template and substitute paths.
+    #    The template (9292.desktop) is a real file shipped in the repo so
+    #    people can inspect it. install.sh fills in the absolute paths.
+    if [[ -f "$SCRIPT_DIR/9292.desktop" ]]; then
+        cp -f "$SCRIPT_DIR/9292.desktop" "$DESKTOP_FILE"
+        # Substitute the placeholder tokens with this user's install paths.
+        sed -i \
+            -e "s|__RUN_FILE__|$RUN_FILE|g" \
+            -e "s|__ICON_FILE__|$ICON_FILE|g" \
+            "$DESKTOP_FILE"
+        ok "Menu entry: $DESKTOP_FILE"
+    else
+        warn "9292.desktop template not found next to install.sh — skipping menu entry."
+    fi
 
     # 6) Refresh desktop / icon databases if the tools exist
     command -v update-desktop-database >/dev/null 2>&1 && \

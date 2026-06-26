@@ -39,10 +39,17 @@ configurable title bar.
 | "No sudo" | Installs to `~/.local/share/9292-app/` only |
 | "Doesn't tweak 9292's frontend" | Pure launcher, zero DOM modification |
 
-### Quick install
+### Quick install (Ubuntu / Debian / any GNOME desktop)
 
 ```bash
-cd desktop-app
+curl -fsSL https://raw.githubusercontent.com/samantha-agi/9292/main/desktop-app/install.sh | bash
+```
+
+Or, if you prefer to inspect first:
+
+```bash
+git clone https://github.com/samantha-agi/9292.git
+cd 9292/desktop-app
 ./install.sh
 ```
 
@@ -52,20 +59,20 @@ window title, optional user-agent override), then writes everything to:
 ```
 ~/.local/share/9292-app/          (app, icon, launcher)
 ~/.config/9292-app/config.toml    (your config)
-~/.local/share/applications/9292.desktop  (GNOME menu entry)
+~/.local/share/applications/9292.desktop  (GNOME menu entry — makes it a real app)
 ```
 
 Find **9292** in your GNOME app grid, or run `~/.local/share/9292-app/run.sh`.
 
 ### Requirements
 
-Ubuntu 22.04+ / Debian 12+ / any GNOME 42+ desktop.
+Ubuntu 22.04+ / Debian 12+ / any GNOME 42+ desktop. Three system packages are
+needed — the installer detects missing ones and offers to install them (only
+this step needs sudo):
 
 ```bash
 sudo apt install python3-gi gir1.2-gtk-4.0 gir1.2-webkit2-4.1
 ```
-
-(The installer detects missing packages and offers to install them.)
 
 ### Uninstall
 

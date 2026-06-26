@@ -1,0 +1,28 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=9292
+GenericName=Travel Planner
+Comment=Plan your trip with Dutch public transport
+Comment[nl]=Plan je reis met het openbaar vervoer
+Exec=__RUN_FILE__ %U
+Icon=__ICON_FILE__
+Terminal=false
+Categories=Travel;Network;GTK;GNOME;
+Keywords=9292;reisplanner;ov;public transport;travel;trein;bus;tram;metro;ferry;
+
+# WM_CLASS matching — the Python app calls GLib.set_prgname("9292ov")
+# in main(), which sets the WM_CLASS on X11. GNOME uses StartupWMClass
+# to associate the running window with this .desktop file, so the
+# launcher icon and the running window group together (no "two icons
+# in the taskbar"). On Wayland, the app-id is used instead.
+StartupNotify=true
+StartupWMClass=9292ov
+
+# Suppress the "New Window" right-click option in the GNOME taskbar.
+# Requires GNOME >= 40 (most modern distros). Older GNOME will simply
+# ignore this key.
+X-GNOME-SingleWindow=true
+
+# Single-instance hint for KDE / other XDG-compliant desktops.
+SingleMainWindow=true
