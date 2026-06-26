@@ -10,7 +10,16 @@
 #   ~/.config/9292-app/config.toml         (your config)
 #   ~/.local/share/applications/9292.desktop (app menu entry)
 #
-# No sudo. No system-wide changes. To remove: ./install.sh --uninstall
+# No sudo for the app itself. To remove: ./install.sh --uninstall
+#
+# Three ways to run:
+#   1. Piped:   curl -fsSL <URL> | bash
+#   2. Download: curl -fsSL <URL> -o install.sh && bash install.sh
+#   3. Cloned:  git clone ... && cd 9292/desktop-app && ./install.sh
+#
+# In modes 1 and 2 the companion files (9292-app.py, icon.png,
+# 9292.desktop, config.toml) are not on disk — this script downloads
+# them automatically from the GitHub repo.
 # =====================================================================
 set -euo pipefail
 
@@ -27,8 +36,19 @@ RUN_FILE="${DATA_DIR}/run.sh"
 CONFIG_FILE="${CONFIG_DIR}/config.toml"
 DESKTOP_FILE="${APPS_DIR}/9292.desktop"
 
+# GitHub raw base URL for fetching companion files in piped/download mode.
+REPO_RAW_BASE="https://raw.githubusercontent.com/samantha-agi/9292/main/desktop-app"
+
 # Where this script lives — used to find the bundled app files.
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# When piped via `curl ... | bash`, BASH_SOURCE[0] is empty (no file), so we
+# detect that and download companion files from GitHub instead.
+# Use ${VAR:-} form so `set -u` doesn't abort on unset BASH_SOURCE.
+SCRIPT_SOURCE="${BASH_SOURCE[0]:-}"
+if [[ -n "$SCRIPT_SOURCE" ]]; then
+    SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_SOURCE")" && pwd)"
+else
+    SCRIPT_DIR=""
+fi
 
 # ----- pretty printing ------------------------------------------------
 if [[ -t 1 ]]; then
@@ -44,22 +64,34 @@ die()    { printf '%s\n' "${C_BOLD}${C_RED}✗${C_RESET} $*" >&2; exit 1; }
 prompt() { printf '%s' "${C_BOLD}${C_BLUE}>>>${C_RESET} $* "; }
 
 # ----- dependency check ----------------------------------------------
+# Checks three things separately so we diagnose correctly:
+#   - python3 binary
+#   - python3-gi (PyGObject — `import gi`)
+#   - gir1.2-gtk-4.0 typelib (gi.require_version Gtk 4.0)
+#   - gir1.2-webkit2-4.1 typelib (gi.require_version WebKit2 4.1)
+# Each is its own apt package on Ubuntu/Debian.
 check_dependencies() {
     local missing=()
+
     command -v python3 >/dev/null 2>&1 || missing+=("python3")
-    # Check the GIR typelibs that PyGObject loads at runtime.
-    python3 - <<'PY' 2>/dev/null || missing+=("gir1.2-gtk-4.0")
-import gi
-gi.require_version("Gtk", "4.0")
-from gi.repository import Gtk
-PY
-    python3 - <<'PY' 2>/dev/null || missing+=("gir1.2-webkit2-4.1")
-import gi
-gi.require_version("WebKit2", "4.1")
-from gi.repository import WebKit2
-PY
+
+    # Check PyGObject itself (the python3-gi package) — distinct from the GIR typelibs.
+    if ! python3 -c 'import gi' 2>/dev/null; then
+        missing+=("python3-gi")
+    fi
+
+    # Now check the GTK4 typelib. Only meaningful if python3-gi is present.
+    if [[ " ${missing[*]} " != *" python3-gi "* ]]; then
+        if ! python3 -c 'import gi; gi.require_version("Gtk","4.0")' 2>/dev/null; then
+            missing+=("gir1.2-gtk-4.0")
+        fi
+        if ! python3 -c 'import gi; gi.require_version("WebKit2","4.1")' 2>/dev/null; then
+            missing+=("gir1.2-webkit2-4.1")
+        fi
+    fi
 
     if [[ ${#missing[@]} -gt 0 ]]; then
+        echo
         warn "Missing system packages: ${missing[*]}"
         say "Install them with:"
         printf '    %ssudo apt install %s%s\n' \
@@ -69,10 +101,55 @@ PY
         if [[ "${answer:-Y}" =~ ^[Yy]$ ]]; then
             sudo apt update
             sudo apt install -y "${missing[@]}"
+            # Re-check after install.
+            local still_missing=()
+            command -v python3 >/dev/null 2>&1 || still_missing+=("python3")
+            if ! python3 -c 'import gi' 2>/dev/null; then
+                still_missing+=("python3-gi")
+            else
+                if ! python3 -c 'import gi; gi.require_version("Gtk","4.0")' 2>/dev/null; then
+                    still_missing+=("gir1.2-gtk-4.0")
+                fi
+                if ! python3 -c 'import gi; gi.require_version("WebKit2","4.1")' 2>/dev/null; then
+                    still_missing+=("gir1.2-webkit2-4.1")
+                fi
+            fi
+            if [[ ${#still_missing[@]} -gt 0 ]]; then
+                die "These packages still couldn't be loaded: ${still_missing[*]}"
+            fi
+            ok "Dependencies installed."
         else
             die "Cannot continue without these packages. Aborting."
         fi
     fi
+}
+
+# ----- companion file acquisition ------------------------------------
+# Returns 0 if 9292-app.py is available in $SCRIPT_DIR (cloned mode),
+# otherwise downloads all companion files from GitHub into a temp dir
+# and repoints $SCRIPT_DIR at it.
+acquire_companion_files() {
+    # Cloned mode: files are already on disk next to this script.
+    if [[ -n "$SCRIPT_DIR" && -f "$SCRIPT_DIR/9292-app.py" ]]; then
+        return 0
+    fi
+
+    # Piped or download mode: fetch from GitHub.
+    say "Fetching app files from GitHub…"
+    command -v curl >/dev/null 2>&1 || die "curl is required to download the app files."
+    local tmp; tmp="$(mktemp -d)"
+    # Ensure the temp dir is cleaned up on exit (any exit path).
+    trap 'rm -rf "$tmp"' EXIT
+
+    local f
+    for f in 9292-app.py 9292.desktop config.toml icon.png; do
+        printf '  %s downloading %s\n' "${C_BOLD}${C_BLUE}→${C_RESET}" "$f"
+        if ! curl -fsSL "$REPO_RAW_BASE/$f" -o "$tmp/$f"; then
+            die "Failed to download $f from $REPO_RAW_BASE/$f"
+        fi
+    done
+    SCRIPT_DIR="$tmp"
+    ok "App files downloaded."
 }
 
 # ----- uninstall ------------------------------------------------------
@@ -201,6 +278,7 @@ do_install() {
     echo
 
     check_dependencies
+    acquire_companion_files
 
     ask_size
     ask_titlebar
@@ -213,18 +291,15 @@ do_install() {
     mkdir -p "$DATA_DIR" "$APPS_DIR"
 
     # 1) The app itself
-    if [[ -f "$SCRIPT_DIR/9292-app.py" ]]; then
-        cp -f "$SCRIPT_DIR/9292-app.py" "$DATA_FILE"
-    else
-        die "Cannot find 9292-app.py next to install.sh. Run this script from the desktop-app folder."
-    fi
+    cp -f "$SCRIPT_DIR/9292-app.py" "$DATA_FILE"
     ok "App:     $DATA_FILE"
 
     # 2) The icon (official 9292 PNG — no SVG, per design)
     if [[ -f "$SCRIPT_DIR/icon.png" ]]; then
         cp -f "$SCRIPT_DIR/icon.png" "$ICON_FILE"
+        ok "Icon:    $ICON_FILE"
     else
-        warn "icon.png not found next to install.sh — app will have a generic icon."
+        warn "icon.png not found — app will have a generic icon."
     fi
 
     # 3) Launcher wrapper
@@ -240,18 +315,15 @@ EOF
     write_config
 
     # 5) .desktop entry — copy the static template and substitute paths.
-    #    The template (9292.desktop) is a real file shipped in the repo so
-    #    people can inspect it. install.sh fills in the absolute paths.
     if [[ -f "$SCRIPT_DIR/9292.desktop" ]]; then
         cp -f "$SCRIPT_DIR/9292.desktop" "$DESKTOP_FILE"
-        # Substitute the placeholder tokens with this user's install paths.
         sed -i \
             -e "s|__RUN_FILE__|$RUN_FILE|g" \
             -e "s|__ICON_FILE__|$ICON_FILE|g" \
             "$DESKTOP_FILE"
         ok "Menu entry: $DESKTOP_FILE"
     else
-        warn "9292.desktop template not found next to install.sh — skipping menu entry."
+        warn "9292.desktop template not found — skipping menu entry."
     fi
 
     # 6) Refresh desktop / icon databases if the tools exist

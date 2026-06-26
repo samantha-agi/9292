@@ -2,6 +2,10 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import Link from "next/link";
 import Image from "next/image";
+
+// basePath prefix for GitHub Pages (/9292) — empty in local dev.
+// Next.js sets NEXT_BASE_PATH automatically from next.config.ts basePath.
+const BASE = process.env.NEXT_BASE_PATH ?? "";
 import {
   ArrowRight,
   ArrowDown,
@@ -137,7 +141,7 @@ function SiteHeader() {
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link href="#top" className="flex items-center gap-2.5 group">
           <Image
-            src="/desktop-app/icon.png"
+            src={`${BASE}/desktop-app/icon.png`}
             alt="9292 logo"
             width={28}
             height={28}
@@ -257,7 +261,7 @@ function Hero() {
           {/* Right: the official 9292 logo (PNG, fetched from https://9292.nl/icon-512.png) */}
           <div className="relative">
             <Image
-              src="/desktop-app/icon.png"
+              src={`${BASE}/desktop-app/icon.png`}
               alt="Official 9292 logo"
               width={512}
               height={512}
@@ -379,7 +383,7 @@ function MockWindow() {
         </div>
         <div className="flex items-center gap-2">
           <Image
-              src="/desktop-app/icon.png"
+              src={`${BASE}/desktop-app/icon.png`}
               alt=""
               width={14}
               height={14}
@@ -418,7 +422,7 @@ function MockWindow() {
         <div className="mx-auto max-w-md">
           <div className="mb-6 text-center">
             <Image
-              src="/desktop-app/icon.png"
+              src={`${BASE}/desktop-app/icon.png`}
               alt="9292 logo"
               width={40}
               height={40}
@@ -577,13 +581,13 @@ cd 9292-linux/desktop-app
 
         <div className="mt-6 flex flex-wrap items-center gap-3">
           <Button asChild variant="outline" className="gap-2">
-            <a href="/desktop-app/install.sh" download>
+            <a href={`${BASE}/desktop-app/install.sh`} download>
               <Download className="h-4 w-4" />
               Download install.sh
             </a>
           </Button>
           <Button asChild variant="outline" className="gap-2">
-            <a href="/desktop-app/README.md" download>
+            <a href={`${BASE}/desktop-app/README.md`} download>
               <FileCode2 className="h-4 w-4" />
               Download README
             </a>
@@ -769,7 +773,7 @@ function ConfigExamples({
             <CodeBlock
               code={e.code}
               filename="config.toml"
-              downloadHref="/desktop-app/config.toml"
+              downloadHref={`${BASE}/desktop-app/config.toml`}
               language="toml"
             />
           </div>
@@ -796,7 +800,7 @@ function SourceBrowser({
       filename: "9292-app.py",
       lang: "python",
       code: files.appPy,
-      href: "/desktop-app/9292-app.py",
+      href: `${BASE}/desktop-app/9292-app.py`,
       desc: "The whole app — ~200 lines of Python + GTK 4 + WebKit2.",
     },
     {
@@ -806,7 +810,7 @@ function SourceBrowser({
       filename: "install.sh",
       lang: "bash",
       code: files.installSh,
-      href: "/desktop-app/install.sh",
+      href: `${BASE}/desktop-app/install.sh`,
       desc: "Interactive installer. Asks questions, writes files, no sudo for the app.",
     },
     {
@@ -816,7 +820,7 @@ function SourceBrowser({
       filename: "config.toml",
       lang: "toml",
       code: files.configToml,
-      href: "/desktop-app/config.toml",
+      href: `${BASE}/desktop-app/config.toml`,
       desc: "Default config. Heavily commented — every option explained inline.",
     },
   ];
@@ -1016,7 +1020,7 @@ function SiteFooter() {
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
           <div className="flex items-center gap-2.5">
             <Image
-              src="/desktop-app/icon.png"
+              src={`${BASE}/desktop-app/icon.png`}
               alt="9292 logo"
               width={24}
               height={24}
@@ -1035,7 +1039,7 @@ function SiteFooter() {
             </a>
             <Separator orientation="vertical" className="h-3" />
             <a
-              href="/desktop-app/README.md"
+              href={`${BASE}/desktop-app/README.md`}
               className="hover:text-foreground transition-colors"
             >
               README

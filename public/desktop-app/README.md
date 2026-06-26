@@ -4,6 +4,8 @@ A clean, native **GNOME desktop app** for [9292.nl](https://9292.nl/) — the Du
 public transport journey planner. No Electron, no browser chrome, no frontend
 tweaks. Just the website in a native GTK window with the buttons you choose.
 
+**Project page:** https://samantha-agi.github.io/9292/
+
 > **Not affiliated with 9292.** This is a thin launcher that shows the official
 > 9292 website as-is. The 9292 name and logo belong to their respective owners.
 

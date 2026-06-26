@@ -3,9 +3,41 @@
 A clean, native **GNOME desktop web app** for [9292.nl](https://9292.nl/) — the Dutch
 public transport journey planner — plus a landing page that documents it.
 
+**Landing page: https://samantha-agi.github.io/9292/**
+
 > **Not affiliated with 9292.** This is a thin launcher that shows the official
 > 9292 website as-is. It does not modify the page, inject JavaScript, or call
 > private APIs. The 9292 name and logo belong to their respective owners.
+
+---
+
+## Quick start (Ubuntu / Debian / any GNOME desktop)
+
+**Install the desktop app (one command):**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/samantha-agi/9292/main/desktop-app/install.sh | bash
+```
+
+Or inspect first:
+
+```bash
+git clone https://github.com/samantha-agi/9292.git
+cd 9292/desktop-app
+./install.sh
+```
+
+The installer asks a few questions (window size, which title-bar buttons to
+enable, window title), then installs to `~/.local/share/9292-app/` — **no sudo**
+for the app itself. Find **9292** in your GNOME app grid when it's done.
+
+**Uninstall:**
+
+```bash
+~/.local/share/9292-app/run.sh --uninstall
+```
+
+**View the landing page:** https://samantha-agi.github.io/9292/
 
 ---
 
@@ -15,13 +47,14 @@ public transport journey planner — plus a landing page that documents it.
 .
 ├── desktop-app/          ← the actual Linux desktop app
 │   ├── 9292-app.py       ← ~200 lines of Python + GTK 4 + WebKit2
+│   ├── 9292.desktop      ← static .desktop template (install.sh fills paths)
 │   ├── config.toml       ← user config (window size, title-bar buttons, UA)
 │   ├── install.sh        ← interactive installer (no sudo for the app)
 │   ├── icon.png          ← official 9292 PNG icon (from 9292.nl/icon-512.png)
 │   └── README.md         ← full desktop-app docs
 │
-└── src/ + public/        ← the Next.js landing page that documents the app
-                            (served at / — see "Landing page" below)
+├── src/ + public/        ← the Next.js landing page (deployed to GitHub Pages)
+└── .github/workflows/    ← GitHub Actions: auto-deploys the landing page on push
 ```
 
 ## The desktop app
@@ -39,31 +72,6 @@ configurable title bar.
 | "No sudo" | Installs to `~/.local/share/9292-app/` only |
 | "Doesn't tweak 9292's frontend" | Pure launcher, zero DOM modification |
 
-### Quick install (Ubuntu / Debian / any GNOME desktop)
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/samantha-agi/9292/main/desktop-app/install.sh | bash
-```
-
-Or, if you prefer to inspect first:
-
-```bash
-git clone https://github.com/samantha-agi/9292.git
-cd 9292/desktop-app
-./install.sh
-```
-
-The installer asks you a few questions (size, which title-bar buttons to enable,
-window title, optional user-agent override), then writes everything to:
-
-```
-~/.local/share/9292-app/          (app, icon, launcher)
-~/.config/9292-app/config.toml    (your config)
-~/.local/share/applications/9292.desktop  (GNOME menu entry — makes it a real app)
-```
-
-Find **9292** in your GNOME app grid, or run `~/.local/share/9292-app/run.sh`.
-
 ### Requirements
 
 Ubuntu 22.04+ / Debian 12+ / any GNOME 42+ desktop. Three system packages are
@@ -72,12 +80,6 @@ this step needs sudo):
 
 ```bash
 sudo apt install python3-gi gir1.2-gtk-4.0 gir1.2-webkit2-4.1
-```
-
-### Uninstall
-
-```bash
-./install.sh --uninstall
 ```
 
 ### Config
@@ -108,12 +110,20 @@ and keyboard shortcuts.
 ## The landing page
 
 A [Next.js 16](https://nextjs.org/) + TypeScript + Tailwind CSS + shadcn/ui
-site that documents the desktop app. It's the page served at `/` when you run
-the dev server.
+site that documents the desktop app.
+
+**Live:** https://samantha-agi.github.io/9292/
+
+The site auto-deploys to GitHub Pages on every push to `main` (via
+`.github/workflows/deploy.yml`). It's built as a static export with
+`basePath: /9292` so all asset URLs resolve correctly under
+`https://samantha-agi.github.io/9292/`.
+
+To run it locally:
 
 ```bash
 bun install
-bun run dev    # http://localhost:3000
+bun run dev    # http://localhost:3000 (no basePath locally)
 ```
 
 The landing page reads the `desktop-app/` files from disk at build time (single
