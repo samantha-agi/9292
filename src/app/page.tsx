@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import Link from "next/link";
+import Image from "next/image";
 import {
   ArrowRight,
   ArrowDown,
@@ -135,7 +136,13 @@ function SiteHeader() {
     <header className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link href="#top" className="flex items-center gap-2.5 group">
-          <span className="checker-2x2 h-7 w-7 rounded-md ring-1 ring-border transition-transform group-hover:scale-105" />
+          <Image
+            src="/desktop-app/icon.png"
+            alt="9292 logo"
+            width={28}
+            height={28}
+            className="h-7 w-7 rounded-md ring-1 ring-border transition-transform group-hover:scale-105"
+          />
           <span className="font-mono text-base font-bold tracking-tight">
             9292
             <span className="text-muted-foreground font-normal"> for Linux</span>
@@ -247,33 +254,16 @@ function Hero() {
             </div>
           </div>
 
-          {/* Right: stylised 9292 checker logo card */}
+          {/* Right: the official 9292 logo (PNG, fetched from https://9292.nl/icon-512.png) */}
           <div className="relative">
-            <div className="checker-2x2 relative mx-auto aspect-square w-full max-w-md rounded-2xl shadow-2xl ring-1 ring-border overflow-hidden">
-              <div className="absolute inset-0 grid grid-cols-2 grid-rows-2">
-                {/* The "9292" text overlaid in the four quadrants */}
-                <div className="flex items-center justify-center">
-                  <span className="text-white font-mono font-bold text-7xl sm:text-8xl lg:text-9xl">
-                    9
-                  </span>
-                </div>
-                <div className="flex items-center justify-center">
-                  <span className="text-black font-mono font-bold text-7xl sm:text-8xl lg:text-9xl">
-                    2
-                  </span>
-                </div>
-                <div className="flex items-center justify-center">
-                  <span className="text-black font-mono font-bold text-7xl sm:text-8xl lg:text-9xl">
-                    9
-                  </span>
-                </div>
-                <div className="flex items-center justify-center">
-                  <span className="text-white font-mono font-bold text-7xl sm:text-8xl lg:text-9xl">
-                    2
-                  </span>
-                </div>
-              </div>
-            </div>
+            <Image
+              src="/desktop-app/icon.png"
+              alt="Official 9292 logo"
+              width={512}
+              height={512}
+              priority
+              className="mx-auto block aspect-square w-full max-w-md rounded-2xl shadow-2xl ring-1 ring-border"
+            />
             <div className="mt-4 text-center text-xs text-muted-foreground font-mono">
               official 9292 icon · used as the .desktop launcher icon
             </div>
@@ -388,7 +378,13 @@ function MockWindow() {
           </button>
         </div>
         <div className="flex items-center gap-2">
-          <span className="checker-2x2 h-3.5 w-3.5 rounded-[3px]" />
+          <Image
+              src="/desktop-app/icon.png"
+              alt=""
+              width={14}
+              height={14}
+              className="h-3.5 w-3.5 rounded-[3px]"
+            />
           <span className="text-xs font-medium text-foreground">
             Plan je reis met het OV en deelvervoer | 9292
           </span>
@@ -421,7 +417,13 @@ function MockWindow() {
       <div className="bg-background p-6 sm:p-10">
         <div className="mx-auto max-w-md">
           <div className="mb-6 text-center">
-            <div className="checker-2x2 mx-auto mb-3 h-10 w-10 rounded" />
+            <Image
+              src="/desktop-app/icon.png"
+              alt="9292 logo"
+              width={40}
+              height={40}
+              className="mx-auto mb-3 h-10 w-10 rounded"
+            />
             <div className="text-xl font-bold">Plan je reis</div>
             <div className="text-sm text-muted-foreground">
               met het OV en deelvervoer
@@ -1013,7 +1015,13 @@ function SiteFooter() {
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
           <div className="flex items-center gap-2.5">
-            <span className="checker-2x2 h-6 w-6 rounded ring-1 ring-border" />
+            <Image
+              src="/desktop-app/icon.png"
+              alt="9292 logo"
+              width={24}
+              height={24}
+              className="h-6 w-6 rounded ring-1 ring-border"
+            />
             <span className="font-mono text-sm font-medium">
               9292 <span className="text-muted-foreground">for Linux</span>
             </span>

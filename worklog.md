@@ -41,3 +41,22 @@ Stage Summary:
 - Install is fully user-local (~/.local/share/9292-app/ + ~/.config/9292-app/), no sudo for the app itself (only apt deps if missing). Uninstall via ./install.sh --uninstall.
 - Landing page is AAA-grade: sticky header, hero with CSS-rendered 9292 checker logo, full feature/config/source/FAQ sections, light+dark themes, mobile-responsive, sticky footer, all downloads served from /desktop-app/*.
 - All verification passed: lint clean, server healthy, VLM-confirmed visual quality, all interactions work, no runtime errors.
+
+---
+Task ID: 2
+Agent: main (Z.ai Code)
+Task: Fix the landing page to use the official 9292 logo PNG instead of a CSS recreation
+
+Work Log:
+- User pointed out that the landing page hero used a CSS "checker-2x2 with 9292 digits" recreation instead of the official logo PNG. Confirmed: desktop-app/icon.png was already the real official PNG (from https://9292.nl/icon-512.png), but src/app/page.tsx used a CSS approximation in 5 places (header, hero, mock-window header, mock-window form, footer).
+- Added `import Image from "next/image"` to page.tsx.
+- Replaced all 5 CSS `.checker-2x2` usages with `<Image src="/desktop-app/icon.png" ...>` (real official PNG), sized appropriately (28px header, 512px hero, 14px mock header, 40px mock form, 24px footer). Added `priority` to the hero image for LCP.
+- Removed the now-dead `.checker-2x2` CSS class (and its dark-mode variant) from globals.css. Kept `.checker-tile` (still used as the hero background texture).
+- Ran `bun run lint`: clean (0 errors).
+- Verified with Agent Browser + VLM: hero, header, mock window, and footer all display the real official 9292 logo; no broken images; no runtime errors.
+- Note: user also linked https://github.com/samantha-agi/9292.git — clone failed (private repo / needs auth). Awaiting user clarification on what they want done with it (push? compare? reference?).
+
+Stage Summary:
+- Landing page now uses the official 9292 PNG logo everywhere it previously used a CSS recreation.
+- Single source of truth: /public/desktop-app/icon.png (the file fetched from 9292.nl), served both as the desktop launcher icon and as every logo shown on the website.
+- Pending: user clarification on the GitHub repo they linked.

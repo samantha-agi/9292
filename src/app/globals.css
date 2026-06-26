@@ -121,29 +121,6 @@
   }
 }
 
-/* ---- 9292 checker pattern (2x2, the iconic 9292 look) ------------------ */
-/* TL=black, TR=white, BL=white, BR=black                                  */
-.checker-2x2 {
-  background-color: #fff;
-  background-image:
-    linear-gradient(to bottom right, #000 50%, transparent 50%),
-    linear-gradient(to bottom left, #000 50%, transparent 50%),
-    linear-gradient(to top right, #000 50%, transparent 50%),
-    linear-gradient(to top left, #000 50%, transparent 50%);
-  background-size: 50% 50%;
-  background-position: top left, top right, bottom left, bottom right;
-  background-repeat: no-repeat;
-}
-:is(.dark) .checker-2x2 {
-  /* Invert so the checker stays punchy on dark backgrounds */
-  background-color: #000;
-  background-image:
-    linear-gradient(to bottom right, #fff 50%, transparent 50%),
-    linear-gradient(to bottom left, #fff 50%, transparent 50%),
-    linear-gradient(to top right, #fff 50%, transparent 50%),
-    linear-gradient(to top left, #fff 50%, transparent 50%);
-}
-
 /* Subtle tiled checker for section backgrounds (very low opacity) */
 .checker-tile {
   background-image:
