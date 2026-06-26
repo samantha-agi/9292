@@ -52,3 +52,19 @@ prompt
 server.log
 # Skills directory
 /skills/
+
+# env files — never commit real env
+.env
+.env.*
+!.env.example
+
+# internal process docs
+worklog.md
+
+# Z.ai Code scaffold artifacts (not part of the 9292 deliverable)
+/skills/
+/.zscripts/
+/examples/
+/mini-services/
+/download/
+/db/
