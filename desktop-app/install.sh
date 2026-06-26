@@ -63,6 +63,18 @@ warn()   { printf '%s\n' "${C_BOLD}${C_YELLOW}!${C_RESET} $*"; }
 die()    { printf '%s\n' "${C_BOLD}${C_RED}✗${C_RESET} $*" >&2; exit 1; }
 prompt() { printf '%s' "${C_BOLD}${C_BLUE}>>>${C_RESET} $* "; }
 
+# Read a line from the terminal (/dev/tty), NOT from stdin.
+# When piped via `curl ... | bash`, stdin is the curl pipe (the script
+# itself), so `read` would read from the pipe instead of the keyboard.
+# Redirecting to /dev/tty forces reads to come from the controlling
+# terminal, making interactive prompts work in all three modes:
+#   curl | bash     (stdin = pipe, /dev/tty = keyboard)
+#   bash install.sh (stdin = keyboard already)
+#   ./install.sh    (stdin = keyboard already)
+tty_read() {
+    read -r "$@" </dev/tty
+}
+
 # ----- dependency check ----------------------------------------------
 # Checks three things separately so we diagnose correctly:
 #   - python3 binary
@@ -70,17 +82,46 @@ prompt() { printf '%s' "${C_BOLD}${C_BLUE}>>>${C_RESET} $* "; }
 #   - gir1.2-gtk-4.0 typelib (gi.require_version Gtk 4.0)
 #   - gir1.2-webkit2-4.1 typelib (gi.require_version WebKit2 4.1)
 # Each is its own apt package on Ubuntu/Debian.
+#
+# If `import gi` fails but the package IS installed (per dpkg), we show the
+# actual error and the Python version — this usually means python3 on PATH
+# is a different version than the one python3-gi was built for.
 check_dependencies() {
     local missing=()
 
     command -v python3 >/dev/null 2>&1 || missing+=("python3")
 
-    # Check PyGObject itself (the python3-gi package) — distinct from the GIR typelibs.
+    # Check PyGObject itself (the python3-gi package).
     if ! python3 -c 'import gi' 2>/dev/null; then
-        missing+=("python3-gi")
+        # Is the package actually installed?
+        if dpkg -s python3-gi >/dev/null 2>&1; then
+            # Package is installed but import fails — diagnose.
+            echo
+            warn "python3-gi is installed (per dpkg) but `python3 -c 'import gi'` fails."
+            say "This usually means the python3 on your PATH is a different version"
+            say "than the one python3-gi was built for."
+            echo
+            say "Python version on PATH:"
+            printf '  %s\n' "$(python3 --version 2>&1)"
+            say "Python path:"
+            printf '  %s\n' "$(command -v python3)"
+            say "Actual import error:"
+            python3 -c 'import gi' 2>&1 | sed 's/^/  /'
+            echo
+            say "Possible fixes:"
+            say "  1. If you have multiple Pythons, install gi for the right one, e.g.:"
+            printf '     %ssudo apt install python3-gi%s\n' "${C_BOLD}" "${C_RESET}"
+            say "  2. Or check 'ls /usr/lib/python3*/dist-packages/gi/' to see which"
+            say "     Python version has gi installed, and use that one."
+            say "  3. Or run the app with: python3.X ~/.local/share/9292-app/9292-app.py"
+            echo
+            die "Cannot proceed: python3-gi is installed but not importable by the python3 on your PATH."
+        else
+            missing+=("python3-gi")
+        fi
     fi
 
-    # Now check the GTK4 typelib. Only meaningful if python3-gi is present.
+    # Now check the GTK4 typelib. Only meaningful if python3-gi is importable.
     if [[ " ${missing[*]} " != *" python3-gi "* ]]; then
         if ! python3 -c 'import gi; gi.require_version("Gtk","4.0")' 2>/dev/null; then
             missing+=("gir1.2-gtk-4.0")
@@ -97,7 +138,7 @@ check_dependencies() {
         printf '    %ssudo apt install %s%s\n' \
             "${C_BOLD}" "${missing[*]}" "${C_RESET}"
         prompt "Install them now? [Y/n]"
-        local answer; read -r answer
+        local answer; tty_read answer
         if [[ "${answer:-Y}" =~ ^[Yy]$ ]]; then
             sudo apt update
             sudo apt install -y "${missing[@]}"
@@ -183,7 +224,7 @@ Choose the window startup size:
 EOF
     while true; do
         prompt "Pick 1-6 or X:"
-        local a; read -r a
+        local a; tty_read a
         case "${a,,}" in
             1) SIZE="640x480"; break ;;
             2) SIZE="800x600"; break ;;
@@ -192,7 +233,7 @@ EOF
             5) SIZE="1920x1080"; break ;;
             6) SIZE="maximized"; break ;;
             x) prompt "Enter WIDTHxHEIGHT (e.g. 1440x900):"
-               read -r custom
+               tty_read custom
                if [[ "$custom" =~ ^[0-9]{3,5}x[0-9]{3,5}$ ]]; then
                    SIZE="$custom"; break
                else
@@ -209,7 +250,7 @@ ask_yn() {
     if [[ "$default" == "y" ]]; then hint="[Y/n]"; else hint="[y/N]"; fi
     while true; do
         prompt "$question $hint"
-        local a; read -r a
+        local a; tty_read a
         a="${a:-$default}"
         case "${a,,}" in
             y|yes) return 0 ;;
@@ -231,7 +272,7 @@ ask_titlebar() {
 ask_title() {
     echo
     prompt 'Window title: "auto" (follows page title) or type your own [auto]:'
-    read -r TITLE
+    tty_read TITLE
     TITLE="${TITLE:-auto}"
 }
 
@@ -239,7 +280,7 @@ ask_ua() {
     echo
     say "Optional user-agent override (forces the mobile/desktop site regardless of window size)."
     prompt "Press Enter to skip, or paste a User-Agent string:"
-    read -r UA
+    tty_read UA
     UA="${UA:-}"
 }
 
