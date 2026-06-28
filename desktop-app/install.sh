@@ -25,7 +25,7 @@ set -euo pipefail
 
 # ----- paths ----------------------------------------------------------
 APP_NAME="9292"
-APP_ID="nl.9292.desktopapp"
+APP_ID="nl.nine2nine.desktopapp"
 WM_CLASS="9292ov"
 DATA_DIR="${HOME}/.local/share/9292-app"
 CONFIG_DIR="${HOME}/.config/9292-app"
@@ -80,7 +80,7 @@ tty_read() {
 #   - python3 binary
 #   - python3-gi (PyGObject — `import gi`)
 #   - gir1.2-gtk-4.0 typelib (gi.require_version Gtk 4.0)
-#   - gir1.2-webkit2-4.1 typelib (gi.require_version WebKit2 4.1)
+#   - gir1.2-webkit-6.0 typelib (gi.require_version WebKit 6.0)
 # Each is its own apt package on Ubuntu/Debian.
 #
 # If `import gi` fails but the package IS installed (per dpkg), we show the
@@ -126,8 +126,8 @@ check_dependencies() {
         if ! python3 -c 'import gi; gi.require_version("Gtk","4.0")' 2>/dev/null; then
             missing+=("gir1.2-gtk-4.0")
         fi
-        if ! python3 -c 'import gi; gi.require_version("WebKit2","4.1")' 2>/dev/null; then
-            missing+=("gir1.2-webkit2-4.1")
+        if ! python3 -c 'import gi; gi.require_version("WebKit","6.0")' 2>/dev/null; then
+            missing+=("gir1.2-webkit-6.0")
         fi
     fi
 
@@ -151,8 +151,8 @@ check_dependencies() {
                 if ! python3 -c 'import gi; gi.require_version("Gtk","4.0")' 2>/dev/null; then
                     still_missing+=("gir1.2-gtk-4.0")
                 fi
-                if ! python3 -c 'import gi; gi.require_version("WebKit2","4.1")' 2>/dev/null; then
-                    still_missing+=("gir1.2-webkit2-4.1")
+                if ! python3 -c 'import gi; gi.require_version("WebKit","6.0")' 2>/dev/null; then
+                    still_missing+=("gir1.2-webkit-6.0")
                 fi
             fi
             if [[ ${#still_missing[@]} -gt 0 ]]; then

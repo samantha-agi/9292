@@ -4,7 +4,7 @@
 9292 — A clean GNOME desktop web app for 9292.nl
 =================================================
 
-Loads https://9292.nl/ in a native GTK4 + WebKit2 window with a
+Loads https://9292.nl/ in a native GTK4 + WebKit window with a
 configurable title bar (reload / minimize / maximize / close) and a
 configurable startup size.
 
@@ -16,7 +16,7 @@ Config:    ~/.config/9292-app/config.toml
 Data dir:  ~/.local/share/9292-app/
 
 Requires on Ubuntu / Debian:
-    sudo apt install python3-gi gir1.2-gtk-4.0 gir1.2-webkit2-4.1
+    sudo apt install python3-gi gir1.2-gtk-4.0 gir1.2-webkit-6.0
 
 Copyright: Public domain — do whatever you want with this.
 9292 and the 9292 logo are trademarks of their respective owners; this
@@ -32,15 +32,15 @@ from pathlib import Path
 import gi
 
 gi.require_version("Gtk", "4.0")
-gi.require_version("WebKit2", "4.1")
+gi.require_version("WebKit", "6.0")
 
-from gi.repository import Gtk, WebKit2, GLib, Gdk, Gio  # noqa: E402
+from gi.repository import Gtk, WebKit, GLib, Gdk, Gio  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
 
-APP_ID = "nl.9292.desktopapp"
+APP_ID = "nl.nine2nine.desktopapp"
 APP_NAME = "9292"
 # The WM_CLASS the running window reports to the window manager.
 # In GTK4, set_wmclass() was removed. WM_CLASS is set via GLib.set_prgname()
@@ -152,14 +152,14 @@ class NineTwoNineWindow(Gtk.ApplicationWindow):
         if self.cfg["titlebar"].get("close", True):
             layout_parts.append("close")
         if layout_parts:
-            controls = Gtk.WindowControls.new(Gtk.Pack.END)
+            controls = Gtk.WindowControls.new(Gtk.PackType.END)
             controls.set_decoration_layout(",".join(layout_parts))
             header.pack_end(controls)
 
         self.set_titlebar(header)
 
         # ----- WebView ---------------------------------------------------
-        self.webview = WebKit2.WebView()
+        self.webview = WebKit.WebView()
         self.webview.set_vexpand(True)
         self.webview.set_hexpand(True)
 
@@ -232,7 +232,7 @@ class NineTwoNineWindow(Gtk.ApplicationWindow):
             return True
         return False
 
-    def _on_notify_title(self, wv: WebKit2.WebView, _param):
+    def _on_notify_title(self, wv: WebKit.WebView, _param):
         page_title = wv.get_title() or ""
         configured = str(self.cfg["window"].get("title", "auto"))
         display = page_title or APP_NAME if configured == "auto" else configured
