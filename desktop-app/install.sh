@@ -8,7 +8,7 @@
 #   ~/.local/share/9292-app/icon.png       (official 9292 PNG icon)
 #   ~/.local/share/9292-app/run.sh         (launcher script)
 #   ~/.config/9292-app/config.toml         (your config)
-#   ~/.local/share/applications/9292.desktop (app menu entry)
+#   ~/.local/share/applications/<APP_ID>.desktop (app menu entry)
 #
 # No sudo for the app itself. To remove: ./install.sh --uninstall
 #
@@ -34,7 +34,7 @@ DATA_FILE="${DATA_DIR}/9292-app.py"
 ICON_FILE="${DATA_DIR}/icon.png"
 RUN_FILE="${DATA_DIR}/run.sh"
 CONFIG_FILE="${CONFIG_DIR}/config.toml"
-DESKTOP_FILE="${APPS_DIR}/9292.desktop"
+DESKTOP_FILE="${APPS_DIR}/${APP_ID}.desktop"
 
 # GitHub raw base URL for fetching companion files in piped/download mode.
 REPO_RAW_BASE="https://raw.githubusercontent.com/samantha-agi/9292/main/desktop-app"
@@ -198,6 +198,7 @@ do_uninstall() {
     say "Removing the 9292 desktop app for the current user…"
     rm -rfv "$DATA_DIR" 2>/dev/null || true
     rm -fv  "$DESKTOP_FILE" 2>/dev/null || true
+    rm -fv  "${APPS_DIR}/9292.desktop" 2>/dev/null || true  # cleanup old name
     say "Your config at $CONFIG_DIR was left in place."
     say "To remove it too:  rm -rf \"$CONFIG_DIR\""
     if command -v update-desktop-database >/dev/null 2>&1; then
