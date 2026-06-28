@@ -206,7 +206,7 @@ function Hero() {
           <div className="flex flex-col items-start">
             <Badge variant="secondary" className="mb-5 gap-1.5 font-mono text-xs">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-              v1.0 · GTK 4 · WebKit2 4.1
+              v1.0 · GTK 4 · WebKit 6.0
             </Badge>
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
               9292, <span className="text-muted-foreground">as a real</span>
@@ -286,7 +286,7 @@ const FEATURES = [
   {
     icon: Monitor,
     title: "Native GNOME window",
-    body: "Built with GTK 4 and WebKit2 — the same engine GNOME Web (Epiphany) uses. Honors your theme, your fonts, your window manager.",
+    body: "Built with GTK 4 and WebKit — the same engine GNOME Web (Epiphany) uses. Honors your theme, your fonts, your window manager.",
   },
   {
     icon: MousePointerClick,
@@ -569,7 +569,7 @@ cd 9292-linux/desktop-app
                 </code>
                 , and{" "}
                 <code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-                  gir1.2-webkit2-4.1
+                  gir1.2-webkit-6.0
                 </code>
                 . The installer detects missing ones and offers to install them
                 with <code className="font-mono text-xs">apt install</code>{" "}
@@ -801,7 +801,7 @@ function SourceBrowser({
       lang: "python",
       code: files.appPy,
       href: `${BASE}/desktop-app/9292-app.py`,
-      desc: "The whole app — ~200 lines of Python + GTK 4 + WebKit2.",
+      desc: "The whole app — ~200 lines of Python + GTK 4 + WebKit.",
     },
     {
       id: "install",
@@ -944,11 +944,11 @@ const FAQ_ITEMS = [
   },
   {
     q: "How do I uninstall?",
-    a: "Run ./install.sh --uninstall. It removes the app, the icon, the launcher, and the .desktop menu entry. Your config at ~/.config/9292-app/ is kept in case you reinstall — delete that folder manually for a full clean slate.",
+    a: "Two options: if you have the repo, run ./install.sh --uninstall. If you installed via curl, run: curl -fsSL https://raw.githubusercontent.com/samantha-agi/9292/main/desktop-app/install.sh | bash -s -- --uninstall. Both remove the app binary, the icon, the launcher script, and the .desktop menu entry. Your config at ~/.config/9292-app/ is kept — delete that folder manually (rm -rf ~/.config/9292-app) for a full clean slate.",
   },
   {
     q: "Does it work on Wayland?",
-    a: "Yes. GTK 4 and WebKit2 4.1 are fully Wayland-native. The window controls are drawn by GTK (not the WM), so they look identical on Wayland and X11.",
+    a: "Yes. GTK 4 and WebKit 6.0 are fully Wayland-native. The window controls are drawn by GTK (not the WM), so they look identical on Wayland and X11.",
   },
   {
     q: "Can I run multiple instances?",

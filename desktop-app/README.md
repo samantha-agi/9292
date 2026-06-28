@@ -52,7 +52,7 @@ cd 9292/desktop-app
 
 ```
 ~/.local/share/9292-app/
-├── 9292-app.py        ← the app (Python + GTK 4 + WebKit2)
+├── 9292-app.py        ← the app (Python + GTK 4 + WebKit)
 ├── icon.png           ← official 9292 PNG icon
 ├── run.sh             ← launcher script (what the .desktop file calls)
 └── (9292.desktop is installed to ~/.local/share/applications/)
@@ -78,7 +78,7 @@ needed — the installer detects missing ones and offers to install them (only
 this step needs sudo):
 
 ```bash
-sudo apt install python3-gi gir1.2-gtk-4.0 gir1.2-webkit2-4.1
+sudo apt install python3-gi gir1.2-gtk-4.0 gir1.2-webkit-6.0
 ```
 
 ---
@@ -170,7 +170,7 @@ browser is a non-issue.
 
 ```
 desktop-app/
-├── 9292-app.py     ← the app (~200 lines of Python + GTK 4 + WebKit2)
+├── 9292-app.py     ← the app (~200 lines of Python + GTK 4 + WebKit)
 ├── 9292.desktop    ← static .desktop template (install.sh fills in paths)
 ├── config.toml     ← default config (heavily commented)
 ├── install.sh      ← interactive installer + --uninstall
